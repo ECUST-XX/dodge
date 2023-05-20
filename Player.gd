@@ -5,7 +5,7 @@ extends Area2D
 # var a = 2
 # var b = "text"
 
-export var speed = 400
+@export var speed = 400
 
 signal hit
 
@@ -29,37 +29,36 @@ func _process(delta):
 	
 	if velocity.length() >= 0:
 		velocity = velocity.normalized() * speed
-		$AnimatedSprite.play()
+		$AnimatedSprite2D.play()
 	else:
-		$AnimatedSprite.stop()
+		$AnimatedSprite2D.stop()
 		
 	position += velocity*delta
-	position.x = clamp(position.x,0,screen_size.x)
-	position.y = clamp(position.y,0,screen_size.y)
+	position = position.clamp(Vector2.ZERO, screen_size)
+
 	
 	if velocity.x != 0:
-		$AnimatedSprite.animation = "walk"
-		$AnimatedSprite.flip_v = false
-		$AnimatedSprite.flip_h = velocity.x<0
+		$AnimatedSprite2D.animation = "walk"
+		$AnimatedSprite2D.flip_v = false
+		$AnimatedSprite2D.flip_h = velocity.x<0
 	elif velocity.y != 0:
-		$AnimatedSprite.animation = "up"
-		$AnimatedSprite.flip_v = velocity.y>0
+		$AnimatedSprite2D.animation = "up"
+		$AnimatedSprite2D.flip_v = velocity.y>0
 	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
 
-
-func _on_Player_body_entered(body):
-	hide()
-	emit_signal("hit")
-	print(body)
-	$CollisionShape2D.set_deferred("disabled",true)
+	
 
 func start(pos):
 	position = pos
 	show()
 	$CollisionShape2D.disabled = false
-	
-	
+
+func _on_Player_body_entered(_body):
+	hide()
+	hit.emit()
+	print('hit',_body)
+	$CollisionShape2D.set_deferred(&"disabled", true)

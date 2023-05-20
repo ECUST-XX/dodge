@@ -8,10 +8,9 @@ extends RigidBody2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	$AnimatedSprite.playing = true
-	var mob_type = $AnimatedSprite.frames.get_animation_names()
-	$AnimatedSprite.animation = mob_type[randi()%mob_type.size()]
-
+	$AnimatedSprite2D.play()
+	var mob_type = Array($AnimatedSprite2D.sprite_frames.get_animation_names())
+	$AnimatedSprite2D.animation = mob_type.pick_random()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

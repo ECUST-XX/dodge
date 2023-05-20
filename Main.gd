@@ -5,12 +5,12 @@ extends Node
 # var a = 2
 # var b = "text"
 
-export(PackedScene) var mob_scene
+@export var mob_scene: PackedScene
 var score
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	randomize()
+	$Player.start($StartPosition.position)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -19,6 +19,7 @@ func _ready():
 
 
 func game_over():
+	print("game_over")
 	$ScoreTimer.stop()
 	$MobTimer.stop()
 	$HUD.show_game_over()
@@ -26,21 +27,22 @@ func game_over():
 	$DeathSound.play()
 	
 func new_game():
+	print("new_game")
 	score = 0
 	$Player.start($StartPosition.position)
 	$StartTimer.start()
 	$HUD.update_score(score)
 	$HUD.show_message("Get Ready")
-	get_tree().call_group("mobs", "queue_free")
+	get_tree().call_group(&"mobs", &"queue_free")
 	$Music.play()
 
 func _on_MobTimer_timeout():
-	 # Create a new instance of the Mob scene.
-	var mob = mob_scene.instance()
+	# Create a new instance of the Mob scene.
+	var mob = mob_scene.instantiate()
 
 	# Choose a random location on Path2D.
-	var mob_spawn_location = get_node("MobPath/MobSpawnLocation")
-	mob_spawn_location.offset = randi()
+	var mob_spawn_location = get_node(^"MobPath/MobSpawnLocation")
+	mob_spawn_location.progress = randi()
 
 	# Set the mob's direction perpendicular to the path direction.
 	var direction = mob_spawn_location.rotation + PI / 2
@@ -49,11 +51,11 @@ func _on_MobTimer_timeout():
 	mob.position = mob_spawn_location.position
 
 	# Add some randomness to the direction.
-	direction += rand_range(-PI / 4, PI / 4)
+	direction += randf_range(-PI / 4, PI / 4)
 	mob.rotation = direction
 
 	# Choose the velocity for the mob.
-	var velocity = Vector2(rand_range(150.0, 250.0), 0.0)
+	var velocity = Vector2(randf_range(150.0, 250.0), 0.0)
 	mob.linear_velocity = velocity.rotated(direction)
 
 	# Spawn the mob by adding it to the Main scene.
@@ -69,4 +71,3 @@ func _on_StartTimer_timeout():
 	$MobTimer.start()
 	$ScoreTimer.start()
 	
-
